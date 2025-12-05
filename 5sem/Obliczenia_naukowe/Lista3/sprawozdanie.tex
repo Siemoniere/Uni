@@ -1,0 +1,262 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{graphicx}
+
+\geometry{a4paper, margin=2.5cm}
+
+\title{Obliczenia naukowe: Sprawozdanie 1}
+\author{Szymon Hładyszewski}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Zadanie 1}
+\subsection{Opis problemu}
+Zadanie polegało na zaimplementowaniu metody bisekcji, która znajdowała miejsca zerowe funkcji. Innymi słowy szukaliśmy rozwiązania równania $f(x) = 0$.
+\subsection{Rozwiązanie}
+Implementacja metody bisekcji została wykonana w pliku \texttt{zadanie13.jl}. Poniżej znajduje się pseudokod tejże funkcji:
+\begin{verbatim}
+function bisection(f, a, b, delta, epsilon)
+    fa = f(a)
+    fb = f(b)
+    e = b - a
+    if sgn(a) * sgn(b) > 0
+        return (Nothing, Nothing, Nothing, 1)
+    end if
+    it = 1
+    r = a + e
+    v = f(r)
+    while true do
+        e = e / 2
+        r = a + e
+        v = f(r)
+        if abs(e) < delta || abs(v) < epsilon then
+            return (r, v, it, 0)
+        end if
+        if sgn(a) * sgn(v) <= 0 then
+            b = r
+            fb = v
+        else
+            a = r
+            fa = v
+        end if
+        it = it + 1
+    end while
+end function
+    
+\end{verbatim}
+Funkcja ta polega na tym, że w każdym kroku dzieli przedział na pół i wybiera tę połowę, w której znajduje się miejsce zerowe. Proces ten powtarza się aż do osiągnięcia zadanej dokładności $\delta$ lub $\epsilon$.
+Funkcja przyjmuje jako argumenty funkcję $f$, przedział $[a, b]$, dokładności $\delta$ i $\epsilon$. Zwraca przybliżone miejsce zerowe, wartość funkcji w tym miejscu, liczbę wykonanych iteracji oraz kod błędu (0 oznacza brak błędu).
+\subsection{Wyniki}
+Wyniki działania funkcji zostały przetestowane w pliku \texttt{test.jl}. Widzimy, że działaja one dla każdych zadanych funkcji i parametrów.
+\subsection{Wnioski}
+Metoda bisekcji jest skuteczną metodą znajdowania miejsc zerowych funkcji, pod warunkiem, że funkcja jest ciągła na danym przedziale i zmienia znak na jego końcach.
+\section{Zadanie 2}
+\subsection{Opis problemu}
+Zadanie polegało na zaimplementowaniu metody Newtona, która znajdowała miejsca zerowe funkcji. Innymi słowy szukaliśmy rozwiązania równania $f(x) = 0$.
+\subsection{Rozwiązanie}
+Implementacja metody Newtona została wykonana w pliku \texttt{zadanie13.jl}. Poniżej znajduje się pseudokod tejże funkcji:
+\begin{verbatim}
+function mstycznych(f, pf, x0, delta, epsilon, maxit)
+    v = f(x0)
+    if abs(v) < epsilon then
+        return (x0, v, 0, err = 0)
+    end if
+    for it from 1 to maxit do
+        pfx0 = pf(x0)
+        if abs(pfx0) < macheps() then
+            return (x0, v, it, err = 2) //pochodna bliska zeru
+        end if
+        x1 = x0 - v / pfx0
+        v = f(x1)
+        if abs(x1 - x0) < delta || abs(v) < epsilon then
+            return (x1, v, it, err = 0)
+        end if
+        x0 = x1
+    end for
+    return (x0, v, maxit, err = 1) //przekroczenie maxit
+end function
+\end{verbatim}
+Funkcja ta polega na iteracyjnym przybliżaniu miejsca zerowego za pomocą stycznych do wykresu funkcji. Proces ten powtarza się aż do osiągnięcia zadanej dokładności $\delta$ lub $\epsilon$, lub przekroczenia maksymalnej liczby iteracji.
+Funkcja przyjmuje jako argumenty funkcję $f$, jej pochodną $pf$, punkt startowy $x0$, dokładności $\delta$ i $\epsilon$, oraz maksymalną liczbę iteracji $maxit$. Zwraca przybliżone miejsce zerowe, wartość funkcji w tym miejscu, liczbę wykonanych iteracji oraz kod błędu (0 oznacza brak błędu).
+\subsection{Wyniki}
+Wyniki działania funkcji zostały przetestowane w pliku \texttt{test.jl}. Widzimy, że działaja one dla każdych zadanych funkcji i parametrów.
+\subsection{Wnioski}
+Metoda Newtona jest skuteczną metodą znajdowania miejsc zerowych funkcji, pod warunkiem, że funkcja jest dostatecznie gładka i punkt startowy jest odpowiednio dobrany.
+\section{Zadanie 3}
+\subsection{Opis problemu}
+Zadanie polegało na zaimplementowaniu metody siecznych, która znajdowała miejsca zerowe funkcji. Innymi słowy szukaliśmy rozwiązania równania $f(x) = 0$.
+\subsection{Rozwiązanie}
+Implementacja metody siecznych została wykonana w pliku \texttt{zadanie13.jl}. Poniżej znajduje się pseudokod tejże funkcji:
+\begin{verbatim}
+function msiecznych(f, x0, x1, delta, epsilon, maxit)
+    f0 = f(x0)
+    f1 = f(x1)
+    for it from 1 to maxit do
+        if abs(f1) > abs(f0) then
+            swap(x0, x1)
+            swap(f0, f1)
+        end if
+        s = (x1 - x0) / (f1 - f0)
+        x0 = x1
+        f0 = f1
+        x1 = x1 - f1 * s
+        f1 = f(x1)
+        if abs(x1 - x0) < delta || abs(f1) < epsilon then
+            return (x1, f1, it, err = 0)
+        end if
+    end for
+    return (x1, f1, maxit, err = 1) //przekroczenie maxit
+end function
+\end{verbatim}
+Funkcja ta polega na iteracyjnym przybliżaniu miejsca zerowego za pomocą linii łączącej dwa punkty na wykresie funkcji. Proces ten powtarza się aż do osiągnięcia zadanej dokładności $\delta$ lub $\epsilon$, lub przekroczenia maksymalnej liczby iteracji.
+Funkcja przyjmuje jako argumenty funkcję $f$, dwa punkty startowe $x0$ i $x1$, dokładności $\delta$ i $\epsilon$, oraz maksymalną liczbę iteracji $maxit$. Zwraca przybliżone miejsce zerowe, wartość funkcji w tym miejscu, liczbę wykonanych iteracji oraz kod błędu (0 oznacza brak błędu).
+\subsection{Wyniki}
+Wyniki działania funkcji zostały przetestowane w pliku \texttt{test.jl}. Widzimy, że działaja one dla każdych zadanych funkcji i parametrów.
+\subsection{Wnioski}
+Metoda siecznych jest skuteczną metodą znajdowania miejsc zerowych funkcji, pod warunkiem, że funkcja jest dostatecznie gładka i punkty startowe są odpowiednio dobrane.
+\section{Zadanie 4}
+\subsection{Opis problemu}
+Zadanie polegało na wyznaczeniu miejsca zerowego funkcji $f(x) = sin(x) - (1/2*x)^2$ za pomocą zaimplementowanych metod: bisekcji, Newtona i siecznych.
+\subsection{Rozwiązanie}
+Do wyznaczenia miejsca zerowego funkcji $f(x) = sin(x) - (1/2*x)^2$ zostały użyte wcześniej zaimplementowane metody. Rozwiązanie zadania zostało zrobione w pliku \texttt{zadanie4.jl}. Liczba iteracji dla Newtona i siecznych została wyznaczona eksperymentalnie.
+\subsection{Wyniki i interpretacja}
+Poniższa tabela przedstawia uzyskane wyniki:
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Metoda & Pierwiastek & Wartość dla tego pierwiastka & Liczba iteracji & kod err \\
+\hline
+Metoda bisekcji&1.9337539672851562& $-2.7027680138402843 \times 10^{-7}$& 16& 0 \\
+Metoda Newtona(stycznych)&1.933753779789742& $-2.2423316314856834 \times 10^{-8}$& 4& 0 \\
+Metoda siecznych& 1.933753644474301& $1.564525129449379 \times 10^{-7}$& 4& 0 \\
+\hline
+\end{tabular}
+\caption{Wyniki znalezienia miejsca zerowego funkcji $f(x) = sin(x) - (1/2*x)^2$}
+\end{table}
+\subsection{Wnioski końcowe}
+Na podstawie tabeli widzimy, że wszystkie trzy metody skutecznie znalazły miejsce zerowe funkcji $f(x) = sin(x) - (1/2*x)^2$. Metoda Newtona i metoda siecznych osiągnęły zadowalającą dokładność w zaledwie 4 iteracjach, podczas gdy metoda bisekcji wymagała 16 iteracji. Warto zauważyć, że metoda Newtona i metoda siecznych są zazwyczaj szybsze od metody bisekcji, ale wymagają znajomości pochodnej funkcji (w przypadku Newtona) lub dwóch punktów startowych (w przypadku siecznych).
+\section{Zadanie 5}
+\subsection{Opis problemu}
+Zadanie polegało na znalezieniu przecięcia się dwóch funkcji $y = 3x$ oraz $y = e^{x}$ przy dokładności $\delta =10^{-4}$ oraz $\epsilon = 10^{-4}$.
+\subsection{Rozwiązanie}
+Aby znaleźć przecięcie się dwóch funkcji $y = 3x$ oraz $y = e^{x}$, należy rozwiązać równanie $3x - e^{x} = 0$. Do tego celu zostały użyte wcześniej zaimplementowane metody. Rozwiązanie zadania zostało zrobione w pliku \texttt{zadanie5.jl}.
+\subsection{Wyniki i interpretacja}
+Poniższy obrazek przedstawia wykres funkcji $f(x) = 3x - e^{x}$. Widzimy, że mamy dwa miejsca zerowe w przedziałach $[0.5, 1.0]$ oraz $[1.0, 2.0]$.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{5.png}
+\caption{Wykres funkcji $f(x) = 3x - e^{x}$}
+\end{figure}
+Poniższa tabela przedstawia uzyskane wyniki:
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Przedział & Pierwiastek & Wartość dla tego pierwiastka & Liczba iteracji & kod err \\
+\hline
+$[0.5, 1.0]$ & 0.6190185546875 & $-4.883657026022448 \times 10^{-5} $& 12 & 0 \\
+$[1.0, 2.0]$ &1.51214599609375& $-1.7583570236290313 \times 10^{-5}$ &14 &0\\
+\hline
+\end{tabular}
+\caption{Wyniki znalezienia przecięcia się funkcji $y = 3x$ oraz $y = e^{x}$}
+\end{table}
+
+\subsection{Wnioski końcowe}
+Aby zastosować metodę bisekcji, należało przekształcić oba wzory funkcji do równania $f(x) = 3x - e^{x} = 0$. Ponadto, należało przeanalizować, na jakich przedziałach spodziewać się można miejsca zerowego. Dopier wtedy można zastosować metodę bisekcji.
+\section{Zadanie 6}
+\subsection{Opis problemu}
+Zadanie polegało na znalezieniu miejsc zerowych funkcji $f_1(x) = e^{1-x} - 1$ oraz $f_2(x) = x e^{-x}$ z dokładnościami $\delta = 10^{-5}$ oraz $\epsilon = 10^{-5}$. Należało wówczas wykorzystac metodę bisekcji, Newtona i siecznych i przeanalizować co się wydarzy, gdy dla Newtona dla $f_1$ weżmiemy $x_0 >1$ a dla $f_2$ wybierzemy $x_0 >= 1$.
+\subsection{Rozwiązanie}
+Do wyznaczenia miejsc zerowych funkcji $f_1(x) = e^{1-x} - 1$ oraz $f_2(x) = x e^{-x}$ zostały użyte wcześniej zaimplementowane metody. Rozwiązanie zadania zostało zrobione w pliku \texttt{zadanie6.jl}.
+\subsection{Wyniki i interpretacja}
+\begin{itemize}
+    \item Metoda bisekcji: przedział $[0.0, 2.0]$
+    \item Metoda Newtona: przybliżenie początkowe: $x_0 = 0.5$, pochodna funkcji: $f'_{1}(x) = -e^{1-x}$
+    \item Metoda siecznych: przybliżenia początkowe: $x_0 = 0.0$, $x_1 = 2.0$
+\end{itemize}
+
+\begin{figure}[H] 
+    
+    \centering 
+
+    \includegraphics[width=0.7\textwidth, keepaspectratio]{61.png}
+
+    \caption{Fragment wykresu funkcji $f(x) = e^{1-x} - 1$}
+    \label{fig:wykres-desmos}
+    
+\end{figure}
+
+\begin{table}[h]
+    \centering
+    \label{tab:wyniki_porownanie_2}
+    \begin{tabular}{|l|c|c|c|c|}
+    \hline
+    \textbf{Metoda} & \textbf{Przybliżenie $x$} & \textbf{Wartość $f(x)$} & \textbf{Iter.} & \textbf{Err} \\ \hline
+    Bisekcji & 1.000000000 & 0.0 & 1 & 0 \\ \hline
+    Newtona & 0.999999999 & $1.12 \times 10^{-10}$ & 4 & 0 \\ \hline
+    Siecznych & 1.000001760 & $-1.76 \times 10^{-6}$ & 6 & 0 \\ \hline
+    \end{tabular}
+    \caption{Wyniki poszukiwania pierwiastka $x \approx 1.0$}
+\end{table}
+
+\subsection{Wnioski dla funkcji $f_1$}
+Wszystkie trzy metody zadziałały poprawnie, zwracając kod błędu $err = 0$.
+Metoda bisekcji była najszybsza, znajdując pierwiastek w zaledwie jednej iteracji. Świadczy to o tym, że pierwiastek znajdował się dokładnie w połowie zadanego przedziału początkowego.
+Metoda Newtona i siecznych również zwróciły poprawne wyniki, potrzebując do tego kolejno 4 i 6 iteracji.
+Wszystkie 3 metody dały wyniki bardzo bliskie dokładnej wartości pierwiastka $x = 1.0$.
+
+\subsection{Rozwiązanie dla funkcji $f_{2}(x) = x \cdot e^{-x}$}
+\begin{itemize}
+    \item Metoda bisekcji: przedział $[-1.0, 2.0]$
+    \item Metoda Newtona: przybliżenie początkowe: $x_0 = 0.5$, pochodna funkcji: $f'_{2}(x) = \frac{1-x}{e^x}$
+    \item Metoda siecznych: przybliżenia początkowe: $x_0 = -1.0$, $x_1 = 1.0$
+\end{itemize}
+
+\begin{figure}[H] 
+    
+    \centering 
+
+    \includegraphics[width=0.7\textwidth, keepaspectratio]{62.png}
+
+    \caption{Fragment wykresu funkcji $f(x) = x \cdot e^{-x}$}
+    \label{fig:wykres-desmos}
+    
+\end{figure}
+
+\begin{table}[h]
+    \centering
+    \caption{Wyniki metod numerycznych dla pierwiastka bliskiego zeru}
+    \label{tab:wyniki_bliskie_zera}
+    \begin{tabular}{|l|c|c|c|c|}
+    \hline
+    \textbf{Metoda} & \textbf{Przybliżenie $x$} & \textbf{Wartość $f(x)$} & \textbf{Iter.} & \textbf{Err} \\ \hline
+    Bisekcji & $7.63 \times 10^{-6}$ & $7.63 \times 10^{-6}$ & 17 & 0 \\ \hline
+    Newtona & $-3.06 \times 10^{-7}$ & $-3.06 \times 10^{-7}$ & 5 & 0 \\ \hline
+    Siecznych & $1.74 \times 10^{-8}$ & $1.74 \times 10^{-8}$ & 18 & 0 \\ \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Wnioski dla funkcji $f_2$}
+Wszystkie trzy metody zadziałały poprawnie, zwracając kod błędu $err = 0$.
+Metoda Newtona była najszybsza, znajduąc pierwiastek w 5 iteracjach.
+Metoda bisekcji potrzebowała 17 iteracji, a metoda siecznych 18 iteracji.
+Wszystkie trzy metody dały wyniki bardzo bliskie dokładnej wartości pierwiastka $x = 0$.
+
+Wybór punktu startowego $x_{0}$ > 1 powoduje, że pochodna funkcji $f_{1}$ jest bardzo mała. W rezultacie otrzymujemy kod błędu $err = 1$, co oznacza, że nie 
+udało się osiągnąć zadanej dokładności w maksymalnej liczbie iteracji. Oczywiście, gdyy $x_{0}$ >> 1, to pochodna jest tak mała, 
+że staje się niereprentowalna i w rezultacie otrzymujemy kod błędu $err = 2$.
+
+Wybór punktu startowego $x_{0}$ > 1, funkcja zwraca niepoprawne wyniki. Wynika to z faktu, że dla $x_{0}$ >> 1, $f_2(x_0)$ < $\epsilon$ i 
+funkcja kończy działanie przeprowadzając 0 iteracji (lub dla $x_{0}$ bliskiego 1, wykonuje kilka iteracji, ale zbliża się do większych wartości x, a nie do pierwiastka).
+Gdy weźmiemy $x_{0} = 1$ to pochodna funkcji $f_{2}$ w tym punkcie jest równa 0, co prowadzi do otrzymania kodu błędu $err = 2$.
+
+\end{document}

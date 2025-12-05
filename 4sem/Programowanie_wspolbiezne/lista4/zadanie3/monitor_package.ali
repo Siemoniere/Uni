@@ -1,0 +1,108 @@
+V "GNAT Lib v10"
+P ZX
+
+RN
+RV NO_EXCEPTION_HANDLERS
+RV NO_EXCEPTIONS
+RV NO_SELECT_STATEMENTS
+RV NO_STANDARD_STORAGE_POOLS
+RV NO_TASKING
+RV NO_TERMINATE_ALTERNATIVES
+RV NO_DEFAULT_INITIALIZATION
+RV NO_ELABORATION_CODE
+RV SPARK_05
+RV MAX_SELECT_ALTERNATIVES=2
+RV MAX_TASK_ENTRIES=2
+RV MAX_TASKS=1
+
+U monitor_package%b	monitor_package.adb	8d090bed OO PK
+Z ada.tags%s		a-tags.adb		a-tags.ali
+Z system%s		system.ads		system.ali
+Z system.soft_links%s	s-soflin.adb		s-soflin.ali
+Z system.tasking%s	s-taskin.adb		s-taskin.ali
+Z system.tasking.rendezvous%s  s-tasren.adb	s-tasren.ali
+Z system.tasking.stages%s  s-tassta.adb		s-tassta.ali
+
+U monitor_package%s	monitor_package.ads	cb141a61 EE OO PK
+Z ada.real_time%s	a-reatim.adb		a-reatim.ali
+Z system%s		system.ads		system.ali
+Z system.parameters%s	s-parame.adb		s-parame.ali
+Z system.soft_links%s	s-soflin.adb		s-soflin.ali
+Z system.task_info%s	s-tasinf.adb		s-tasinf.ali
+Z system.tasking%s	s-taskin.adb		s-taskin.ali
+Z system.tasking.stages%s  s-tassta.adb		s-tassta.ali
+
+D ada.ads		20230707070819 76789da1 ada%s
+D a-except.ads		20230707070819 a7106115 ada.exceptions%s
+D a-finali.ads		20230707070819 bf4f806b ada.finalization%s
+D a-reatim.ads		20230707070818 0240fc73 ada.real_time%s
+D a-stream.ads		20230707070819 119b8fb3 ada.streams%s
+D a-tags.ads		20230707070819 491b781d ada.tags%s
+D a-unccon.ads		20230707070819 0e9b276f ada.unchecked_conversion%s
+D interfac.ads		20230707070819 5ab55268 interfaces%s
+D i-c.ads		20230707070819 5421119b interfaces.c%s
+D monitor_package.ads	20250615205027 cb141a61 monitor_package%s
+D monitor_package.adb	20250615205027 461d118c monitor_package%b
+D system.ads		20230707070819 4635ec04 system%s
+D s-atacco.ads		20230707070819 4c36d12f system.address_to_access_conversions%s
+D s-exctab.ads		20230707070819 54135002 system.exception_table%s
+D s-finroo.ads		20230707070819 4ff27390 system.finalization_root%s
+D s-linux.ads		20230707070818 ed0b8aee system.linux%s
+D s-multip.ads		20230707070819 38ac9f73 system.multiprocessors%s
+D s-oscons.ads		20230708061938 56602da1 system.os_constants%s
+D s-osinte.ads		20230708061938 baabc537 system.os_interface%s
+D s-parame.ads		20230707070819 48ec542b system.parameters%s
+D s-secsta.ads		20230707070819 20bbe636 system.secondary_stack%s
+D s-soflin.ads		20230707070819 a7318a92 system.soft_links%s
+D s-stache.ads		20230707070819 a37c21ec system.stack_checking%s
+D s-stausa.ads		20230707070819 017a0a05 system.stack_usage%s
+D s-stalib.ads		20230707070819 09bd3940 system.standard_library%s
+D s-stoele.ads		20230707070819 2dc34a04 system.storage_elements%s
+D s-tasinf.ads		20230707070818 2b3f8252 system.task_info%s
+D s-taspri.ads		20230707070818 f40ac08d system.task_primitives%s
+D s-taprop.ads		20230707070818 1dd2e1b6 system.task_primitives.operations%s
+D s-taskin.ads		20230707070818 b9d612e2 system.tasking%s
+D s-taprob.ads		20230707070818 acd6094d system.tasking.protected_objects%s
+D s-tpoben.ads		20230707070819 60ad3dae system.tasking.protected_objects.entries%s
+D s-tasren.ads		20230707070818 a67a9949 system.tasking.rendezvous%s
+D s-tassta.ads		20230707070818 cca55c94 system.tasking.stages%s
+D s-traent.ads		20230707070819 005bf670 system.traceback_entries%s
+D s-unstyp.ads		20230707070819 34867c83 system.unsigned_types%s
+G a e
+G c Z s b [monitorTK monitor_package 4 8 none]
+G c Z s b [enter monitor_package__monitor 5 11 none]
+G c Z s b [leave monitor_package__monitor 6 11 none]
+G c Z s s [monitorTKVIP monitor_package 4 3 none]
+G c Z s b [condition monitor_package 9 13 none]
+G c Z s b [signal monitor_package__condition 10 11 none]
+G c Z s b [wait monitor_package__condition 11 11 none]
+G c Z s b [pre_wait monitor_package__condition 12 11 none]
+G c Z s b [waiting monitor_package__condition 13 11 none]
+G c Z s b [non_empty monitor_package 16 12 none]
+G c Z s b [wait monitor_package 17 13 none]
+G c Z s s [P9sIP monitor_package 13 5 none]
+G c Z s s [conditionVIP monitor_package 9 3 none]
+X 10 monitor_package.ads
+2K9*Monitor_Package 19l5 19e20 11|2b14 75l5 75t20
+4t8*Monitor 11|4b13 14l7 14t14 23r13 71r5
+5Y11 Enter 11|8b16
+6Y11 Leave 11|9b16 23s21 71s13
+9T13*Condition 14l7 14e16 16r25 17r28 11|16b13 59l7 59t16 61r25 68r28
+10Y11 Signal 11|22b18 24l15 24t21 34b24 36l21 36t27
+11Y11 Wait 11|31b18 50l15 50t19 72s7
+12Y11 Pre_Wait 11|26b16 28l13 28t21 39b24 41l21 41t29 70s7
+13Y11 Waiting 13<19 11|43b24 45l21 45t28 52b16 54l13 54t20 64s7
+13b19 B{boolean} 11|44m19 44r19 53m11 53r11
+16V12*Non_Empty{boolean} 16>22 11|61b12 66l7 66t16
+16t22 C{9T13} 11|61b22 64r5
+17U13*Wait 17=18 11|68b13 73l7 73t11
+17t18 C{9T13} 11|68b18 70r5 72r5
+X 11 monitor_package.adb
+17i5 My_Count{natural} 21r14 27m11 27r23 30r14 35m19 35r31 40m19 40r31 53r16
+43b32 B{boolean}
+52b24 B{boolean}
+62b5 B{boolean} 64m15 65r12
+X 24 s-stausa.ads
+208U14*Initialize 209i<c,__gnat_stack_usage_initialize>22
+273U14*Output_Results 277i<c,__gnat_stack_usage_output_results>22
+

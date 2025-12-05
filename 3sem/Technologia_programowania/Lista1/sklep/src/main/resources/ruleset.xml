@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ruleset xmlns="http://pmd.sourceforge.net/ruleset_2_0.dtd"
+    name="My Ruleset"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset_2_0.dtd http://pmd.sourceforge.net/ruleset_2_0.xsd">
+    
+    <description>
+        Rules for my project.
+    </description>
+    
+    <rule ref="category/java/bestpractices.xml/BroadCatchBlock" />
+    <rule ref="category/java/design.xml/ExcessiveMethodLength">
+        <properties>
+            <property name="max" value="50"/>
+        </properties>
+    </rule>
+</ruleset>

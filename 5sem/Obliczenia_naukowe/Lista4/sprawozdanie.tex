@@ -1,0 +1,228 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{graphicx}
+
+\geometry{a4paper, margin=2.5cm}
+
+\title{Obliczenia naukowe: Sprawozdanie 1}
+\author{Szymon Hładyszewski}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\section*{Wstęp do problemu interpolacji}
+Interpolacja polega na predykcji przebiegu funkcji $f$ na podstawie danych $n$ punktów $x_1 \ldots x_n$ oraz $y_1 \ldots y_n$, takich, że $y_i = f(x_i)$, gdzie $i = 1, \ldots, n$. W związku z tym, będziemy w tym celu szukać wielomianu interpolacyjnego $P_n(x)$ stopnia co najwyżej $n-1$, który spełnia warunki:
+\[P_n(x_i) = f(x_i) = y_i \quad \text{dla } i = 1, 2, \ldots, n.\]
+Wielomian ten jest najlepiej reprezentowany w postaci Newtona, ponieważ umożliwia efektywne dodawanie nowych węzłów interpolacji bez konieczności przebudowywania całego wielomianu od podstaw. Postać Newtona wielomianu interpolacyjnego jest następująca:
+\[P_n(x) = \sum_{i=0}^{n} f[x_0, x_1, \ldots, x_i] \prod_{j=0}^{i-1} (x - x_j),\]
+gdzie $f[x_0, x_1, \ldots, x_i]$ oznacza ilorazy różnicowe, które będą wyznaczane w zadaniu pierwszym.
+\section{Zadanie 1}
+\subsection{Opis problemu}
+Zadanie polegało na zaimplementowaniu funkcji, która oblicza ilorazy różnicowe. Na wejściu funkcja przyjmuje $x$ będące wektorem długości $n+1$ zawierającym węzły $x_0, x_1, \ldots, x_n$ oraz wektor $f$ długości $n+1$ zawierający wartości funkcji w tych węzłach $f(x_0), f(x_1), \ldots, f(x_n)$. Ilorazy różnicowe są obliczane według wzoru:
+\[f[x_0, x_{1}, \ldots, x_{i}] = \frac{f[x_{1}, \ldots, x_{n}] - f[x_0, \ldots, x_{n-1}]}{x_{n} - x_0},\]
+gdzie $i = 1, 2, \ldots, n$.
+\subsection{Implementacja}
+Poniżej znajduje sie pseudokod implementacji funkcji obliczającej ilorazy różnicowe. Dzięki użyciu jednej tablicy do przechowywania wartości funkcji oraz ilorazów różnicowych, udało się zredukować złożoność pamięciową do $O(n)$ i nie używać tablicy dwuwymiarowej:
+\begin{verbatim}
+    function ilorazyRoznicowe(x, f):
+        fx = f(x)
+        for j from 1 to n:
+            for i from n down to j:
+                fx[i] = (fx[i] - fx[i-1]) / (x[i] - x[i-j])
+        return fx
+\end{verbatim}
+\newpage
+\section{Zadanie 2}
+\subsection{Opis problemu}
+Zadanie polegało na zaimplementowaniu funkcji, która oblicza wartość wielomianu interpolacyjnego w postaci Newtona w zadanym punkcie $t$. Na wejściu funkcja przyjmuje wektor $x$ zawierający węzły interpolacji, wektor $fx$ zawierający ilorazy różnicowe oraz punkt $t$, w którym ma zostać obliczona wartość wielomianu. Wartość tę obliczamy korzystając z uogólnionego algorytmu Hornera dostosowanego do postaci Newtona. Wzór na obliczenie wartości wielomianu w punkcie $t$ jest następujący:
+\[P_n(t) = f[x_0] + (t - x_0) \left( f[x_0, x_1] + (t - x_1) \left( f[x_0, x_1, x_2] + \ldots  + (t - x_{n-1}) f[x_0, x_1, \ldots, x_n] \ldots \right) \right).\]
+Dzięki temu algorytmowi możemy efektywnie obliczyć wartość wielomianu bez konieczności bezpośredniego obliczania wszystkich składników sumy. Ponadto otrzymujemy następującą zależność rekurencyjną:
+\[nt = f[x_0, x_1, \ldots, x_n]\]
+\[nt = f[x_0, x_1, \ldots, x_{i-1}] + (t - x_{i-1}) \cdot nt \quad \text{dla } i = n, n-1, \ldots, 1.\]
+\subsection{Implementacja}
+Poniżej znajduje sie pseudokod implementacji funkcji obliczającej wartość wielomianu interpolacyjnego w postaci Newtona:
+\begin{verbatim}
+    function warNewton(x, fx, t):
+        n = length(x)
+        nt = fx[n]
+        for i from n-1 down to 1:
+            nt = fx[i] + (t - x[i]) * nt
+        return nt
+\end{verbatim}
+\section{Zadanie 3}
+\subsection{Opis problemu}
+Zadanie polegało na zaimplementowaniu funkcji, która oblicza współczynniki wielomianu interpolacyjnego w postaci standardowej (naturalnej) na podstawie ilorazów różnicowych oraz węzłów interpolacji. Współczynniki te są potrzebne do reprezentacji wielomianu w postaci:
+\[P_n(x) = a_0 + a_1 x + a_2 x^2 + \ldots + a_n x^n,\]
+gdzie $a_0, a_1, \ldots, a_n$ są współczynnikami wielomianu. Aby przekształcić wielomian z postaci Newtona do postaci standardowej, należy wykonać operację mnożenia i dodawania wielomianów. Proces ten można zrealizować iteracyjnie, zaczynając od najwyższego stopnia i stopniowo dodając kolejne składniki. Poniżej znajduje się wzór rekurencyjny do obliczania współczynników:
+\[a_k = f[x_0, x_1, \ldots, x_k] + \sum_{j=0}^{k-1} a_j \cdot c_{k-j},\]
+gdzie $c_{k-j}$ są współczynnikami wynikającymi z rozwinięcia iloczynu $(x - x_0)(x - x_1) \ldots (x - x_{k-1})$.
+\subsection{Implementacja}
+Poniżej znajduje sie pseudokod implementacji funkcji obliczającej współczynniki wielomianu w postaci standardowej:
+\begin{verbatim}
+    function naturalna(x, fx):
+        n = length(x)
+        a = array of size n initialized to 0
+        a[n] = fx[n]
+        for i from n-1 down to 0:
+            a[i] = fx[i] - x[i] * a[i+1]
+            for j from i+1 to n - 1:
+                a[j-1] = a[j-1] - x[i] * a[j]
+        return a
+\end{verbatim}
+\section{Zadanie 4}
+Zadanie polegało na zaimplementowaniu funkcji, która interpoluje zadaną funkcję $f$ na przedziale $[a, b]$ za pomocą wielomianu interpolacyjnego stopnia $n$ oraz rysuje wykresy funkcji oryginalnej i wielomianu interpolacyjnego. Węzły interpolacji są wybierane na dwa sposoby:
+  \begin{enumerate}
+    \item jako równoodległe punkty na przedziale $[a, b]$, gdzie $x_i = a + i \cdot \frac{b - a}{n}$ dla $i = 0, 1, \ldots, n$,
+    \item jako węzły będące zerami $n + 1$-go wielomianu Czebyszewa $T_{n+1}$ obliczanego ze wzoru:
+    \[x_i = \frac{a + b}{2} + \frac{b - a}{2} \cos\left(\frac{(2i + 1) \pi}{2(n + 1)}\right) \quad \text{dla } i = 0, 1, \ldots, n.\]
+ \end{enumerate}
+ Funkcja ta korzysta z wcześniej zaimplementowanych metod. Na końcu rysowane są wykresy obu funkcji dla porównania.
+\subsection{Implementacja}
+Poniżej znajduje sie pseudokod implementacji funkcji interpolującej i rysującej wykresy:
+\begin{verbatim}
+    function rysujNnfx(f, a, b, n, wezly)
+        if wezly == "rownoodlegle":
+            x = array of size n+1
+            for i from 0 to n:
+                x[i] = a + i * (b - a) / n
+        else if wezly == "czebyszew":
+            x = array of size n+1
+            for i from 0 to n:
+                x[i] = (a + b) / 2 + (b - a) / 2 * cos((2 * i + 1) * pi / (2 * (n + 1)))
+        fx = f(x)
+        ilorazy = ilorazyRoznicowe(x, fx)
+        t = linspace(a, b, 1000)
+        Pn_t = array of size 1000
+        for j from 0 to 999:
+            Pn_t[j] = warNewton(x, ilorazy, t[j])
+        plot(t, f(t), label="f(x)")
+        plot(t, Pn_t, label="Pn(x)")
+\end{verbatim}
+\section{Zadanie 5}
+\subsection{Opis problemu}
+Zadanie polegało na przetestowaniu wyżej zaimplementowanej funkcji z zadania 4. z wyborem węzłów równoodległych dla nastepujących przypadków:
+\begin{enumerate}
+    \item $f(x) = e^{x}$ na przedziale $[0, 1]$ dla $n = 5, 10, 15$.
+    \item $f(x) = x^{2}*sin(x)$ na przedziale $[-1, 1]$ dla $n = 5, 10, 15$.
+\end{enumerate}
+\newpage
+\subsection{Wyniki}
+Poniżej znajdują się wykresy dla poszczególnych przypadków:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_exp_rownoodlegle_n5.png}
+    \caption{Wykres funkcji $f(x) = e^{x}$ oraz jej wielomianu interpolacyjnego stopnia $n=5$ na przedziale $[0, 1]$}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_exp_rownoodlegle_n10.png}
+    \caption{Wykres funkcji $f(x) = e^{x}$ oraz jej wielomianu interpolacyjnego stopnia $n=10$ na przedziale $[0, 1]$}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_exp_rownoodlegle_n15.png}
+    \caption{Wykres funkcji $f(x) = e^{x}$ oraz jej wielomianu interpolacyjnego stopnia $n=15$ na przedziale $[0, 1]$}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_sinx2_rownoodlegle_n5.png}
+    \caption{Wykres funkcji $f(x) = x^{2}*sin(x)$ oraz jej wielomianu interpolacyjnego stopnia $n=5$ na przedziale $[-1, 1]$}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_sinx2_rownoodlegle_n10.png}
+    \caption{Wykres funkcji $f(x) = x^{2}*sin(x)$ oraz jej wielomianu interpolacyjnego stopnia $n=10$ na przedziale $[-1, 1]$}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_sinx2_rownoodlegle_n15.png}
+    \caption{Wykres funkcji $f(x) = x^{2}*sin(x)$ oraz jej wielomianu interpolacyjnego stopnia $n=15$ na przedziale $[-1, 1]$}
+\end{figure}
+\subsection{Wnioski}
+Dla powyższych wykresów widzimy, że już dla $n = 5$ funkcja pokrywa się tak bardzo z wielomianem, że nie jesteśmy w stanie zauważyć jakichkolwiek odchyleń. Widzimy zatem, że metoda ta działa poprawnie oraz jest skuteczna.
+\section{Zadanie 6}
+\subsection{Opis problemu}
+Zadanie polegało na przetestowaniu wyżej zaimplementowanej funkcji z zadania 4. z wyborem węzłów równoodległych oraz Czebyszewa dla nastepujących przypadków:
+\begin{enumerate}
+    \item $f(x) = |x|$ na przedziale $[-1, 1]$ dla $n = 5, 10, 15$.
+    \item $f(x) = \frac{1}{1+x^{2}}$ na przedziale $[-5, 5]$ dla $n = 5, 10, 15$.
+\end{enumerate}
+\subsection{Wyniki}
+Poniżej znajdują się wykresy dla poszczególnych przypadków:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_abs_rownoodlegle_n5.png}
+    \caption{Wykres funkcji $f(x) = |x|$ oraz jej wielomianu interpolacyjnego stopnia $n=5$ na przedziale $[-1, 1]$ z węzłami równoodległymi}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_abs_rownoodlegle_n10.png}
+    \caption{Wykres funkcji $f(x) = |x|$ oraz jej wielomianu interpolacyjnego stopnia $n=10$ na przedziale $[-1, 1]$ z węzłami równoodległymi}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_abs_rownoodlegle_n15.png}
+    \caption{Wykres funkcji $f(x) = |x|$ oraz jej wielomianu interpolacyjnego stopnia $n=15$ na przedziale $[-1, 1]$ z węzłami równoodległymi}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_abs_czebyszew_n5.png}
+    \caption{Wykres funkcji $f(x) = |x|$ oraz jej wielomianu interpolacyjnego stopnia $n=5$ na przedziale $[-1, 1]$ z węzłami Czebyszewa}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_abs_czebyszew_n10.png}
+    \caption{Wykres funkcji $f(x) = |x|$ oraz jej wielomianu interpolacyjnego stopnia $n=10$ na przedziale $[-1, 1]$ z węzłami Czebyszewa}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_abs_czebyszew_n15.png}
+    \caption{Wykres funkcji $f(x) = |x|$ oraz jej wielomianu interpolacyjnego stopnia $n=15$ na przedziale $[-1, 1]$ z węzłami Czebyszewa}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_1_1plusx2_rownoodlegle_n5.png}
+    \caption{Wykres funkcji $f(x) = \frac{1}{1+x^{2}}$ oraz jej wielomianu interpolacyjnego stopnia $n=5$ na przedziale $[-5, 5]$ z węzłami równoodległymi}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_1_1plusx2_rownoodlegle_n10.png}
+    \caption{Wykres funkcji $f(x) = \frac{1}{1+x^{2}}$ oraz jej wielomianu interpolacyjnego stopnia $n=10$ na przedziale $[-5, 5]$ z węzłami równoodległymi}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_1_1plusx2_rownoodlegle_n15.png}
+    \caption{Wykres funkcji $f(x) = \frac{1}{1+x^{2}}$ oraz jej wielomianu interpolacyjnego stopnia $n=15$ na przedziale $[-5, 5]$ z węzłami równoodległymi}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_1_1plusx2_czebyszew_n5.png}
+    \caption{Wykres funkcji $f(x) = \frac{1}{1+x^{2}}$ oraz jej wielomianu interpolacyjnego stopnia $n=5$ na przedziale $[-5, 5]$ z węzłami Czebyszewa}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_1_1plusx2_czebyszew_n10.png}
+    \caption{Wykres funkcji $f(x) = \frac{1}{1+x^{2}}$ oraz jej wielomianu interpolacyjnego stopnia $n=10$ na przedziale $[-5, 5]$ z węzłami Czebyszewa}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykres_1_1plusx2_czebyszew_n15.png}
+    \caption{Wykres funkcji $f(x) = \frac{1}{1+x^{2}}$ oraz jej wielomianu interpolacyjnego stopnia $n=15$ na przedziale $[-5, 5]$ z węzłami Czebyszewa}
+\end{figure}
+\subsection{Wnioski}
+Powyższe wykresy okazują się być z goła inne niż te z poprzedniego zadania. Widzimy tu znaczną różnicę pomiędzy funkcją a wielomianem, a podniesienie stopnia wielomianu nie powoduje znacznego poprawienia się dopasowania.
+\newline
+\newline
+Dla funkcji $f(x) = |x|$ widzimy, że zarówno dla węzłów równoodległych jak i Czebyszewa, wielomian interpolacyjny dobrze przybliża funkcję, choć węzły Czebyszewa dają nieco lepsze dopasowanie przy wyższych stopniach. Dla funkcji $f(x) = \frac{1}{1+x^{2}}$ zauważamy efekt Rungego przy węzłach równoodległych, gdzie dla wyższych stopni wielomianu pojawiają się duże oscylacje na krańcach przedziału. 
+\subsubsection{Efekt Rungego}
+Efekt Rungego to zjawisko, które występuje podczas interpolacji wielomianowej funkcji na równoodległych węzłach. Polega ono na tym, że wraz ze wzrostem stopnia wielomianu interpolacyjnego, błąd interpolacji na krańcach przedziału rośnie, co prowadzi do dużych oscylacji i odchyleń od rzeczywistej funkcji. W przypadku funkcji $f(x) = \frac{1}{1+x^{2}}$, która ma silne zmiany na krańcach przedziału, efekt ten jest szczególnie widoczny.
+\newline
+\newline
+Węzły Czebyszewa znacznie redukują ten efekt, prowadząc do bardziej stabilnego i dokładnego przybliżenia funkcji. Ogólnie rzecz biorąc, wybór węzłów Czebyszewa jest korzystniejszy dla funkcji o dużych zmianach na krańcach przedziału, co potwierdza teorię dotyczącą interpolacji wielomianowej.
+\end{document}
