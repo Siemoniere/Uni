@@ -6,21 +6,15 @@ function generate_plots()
     end
 
     df = CSV.read("all.txt", DataFrame, delim=';')
-
-    # KLUCZOWA POPRAWKA: Filtrujemy tylko jeden scenariusz (Gen_B), 
-    # aby punkty na wykresie nie dublowały się dla tego samego n
     df_gen = df[df.scenario .== "Gen_B", :]
 
-    # Wykres Czasu
     p1 = plot(title="Złożoność czasowa O(n)", xlabel="Rozmiar n", ylabel="Czas [s]", legend=:topleft)
     for method in unique(df_gen.method)
         sub = df_gen[df_gen.method .== method, :]
-        # Sortujemy po n, na wypadek gdyby w pliku była inna kolejność
         sort!(sub, :n) 
         plot!(p1, sub.n, sub.time, label=method, marker=:circle)
     end
     
-    # Wykres Pamięci
     p2 = plot(title="Złożoność pamięciowa O(n)", xlabel="Rozmiar n", ylabel="Pamięć [MB]", legend=:topleft)
     for method in unique(df_gen.method)
         sub = df_gen[df_gen.method .== method, :]
